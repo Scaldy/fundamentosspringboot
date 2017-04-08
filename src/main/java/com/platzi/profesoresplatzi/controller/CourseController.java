@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.platzi.profesoresplatzi.model.Course;
+import com.platzi.profesoresplatzi.model.Teacher;
 import com.platzi.profesoresplatzi.service.CourseService;
 import com.platzi.profesoresplatzi.service.TeacherService;
 import com.platzi.profesoresplatzi.util.CustomErrorType;
