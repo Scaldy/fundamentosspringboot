@@ -17,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.platzi.profesoresplatzi.model.Course;
 import com.platzi.profesoresplatzi.service.CourseService;
+import com.platzi.profesoresplatzi.service.TeacherService;
 import com.platzi.profesoresplatzi.util.CustomErrorType;
 
 @Controller
@@ -24,6 +25,9 @@ import com.platzi.profesoresplatzi.util.CustomErrorType;
 public class CourseController {
 	@Autowired
 	private CourseService _courseService;
+	
+	@Autowired
+	private TeacherService _teacherService;
 	
 	//GET 
 	@RequestMapping(value = "/courses", method = RequestMethod.GET, headers = "Accept=application/json")
@@ -122,4 +126,24 @@ public class CourseController {
         _courseService.deleteCourseById(id);
         return new ResponseEntity<Course>(HttpStatus.NO_CONTENT);
     }
+	
+	//ASSIGN TEACHER TO COURSE
+	@RequestMapping(value="/courses/teachers", method = RequestMethod.PATCH, headers="Accept=application/json")
+	public ResponseEntity<Course> assignTeacherToCourse(@RequestBody Course course, UriComponentsBuilder ucBuilder){
+		if (course.getIdCourse() == null || course.getTeacher().getIdTeacher() == null) {
+			return new ResponseEntity(new CustomErrorType("We need almost id_course and id_teacher "),HttpStatus.CONFLICT);
+		}
+		Course courseSaved = _courseService.findById(course.getIdCourse());
+		if (courseSaved == null) {
+			return new ResponseEntity(new CustomErrorType("The id_course: " + course.getIdCourse() + " not found."),HttpStatus.CONFLICT);
+		}
+		Teacher teacher = _teacherService.findById(course.getTeacher().getIdTeacher());
+		if (teacher == null) {
+			return new ResponseEntity(new CustomErrorType("The id_teacher: " + course.getTeacher().getIdTeacher() + " not found."),HttpStatus.CONFLICT);
+		}
+		courseSaved.setTeacher(teacher);
+		_courseService.updateCourse(courseSaved);
+
+		return new ResponseEntity<Course>(courseSaved, HttpStatus.OK);
+	}
 }
